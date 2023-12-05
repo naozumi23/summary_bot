@@ -1,15 +1,19 @@
 import streamlit as st
-import openai
+from openai import OpenAI
 # import os
 # from os.path import join, dirname
 # from dotenv import load_dotenv
 
-# api key setting for deploy
-openai.api_key = st.secrets.ChatGptKey.key
-
 # api key setting for local
 # load_dotenv(join(dirname(__file__), '.env'))
-# openai.api_key = os.environ.get("API_KEY")
+# client = OpenAI(
+#     api_key=os.environ.get("API_KEY"),
+# )
+
+# api key setting for deploy
+client = OpenAI(
+    api_key=st.secrets.ChatGptKey.key,
+)
 
 
 def main():
@@ -57,13 +61,13 @@ def main():
             messages.append({"role": "user", "content": prompt})
 
             # make response
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=messages
             )
 
             # add response to messages
-            messages.append(response.choices[0]["message"])
+            messages.append({'role': 'assistant', 'content': response.choices[0].message.content})
 
     st.button("summarize", on_click=do_summary())
 
